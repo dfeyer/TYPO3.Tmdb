@@ -25,6 +25,8 @@ Tips
 
 You can retrive expended information, by adding a third parameter to the search method:
 
+::
+
 	$movies = $this->tmdbService->search('movie', array(
 		'query' => 'Florence'
 	), TRUE);
