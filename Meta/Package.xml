@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://typo3.org/ns/2008/flow3/package" version="1.0">
+	<key>TYPO3.Tmdb</key>
+	<title>Package to use The Movie Database API (TMDB)</title>
+	<description>This package allow the usage of TMDB database. You need a personal API key to use the API. Please check the condition on the TMDB website.</description>
+	<version>0.1.0-dev</version>
+    <parties>
+        <person role="LeadDeveloper">
+            <name>Dominique Feyer</name>
+            <repositoryUserName>dfeyer</repositoryUserName>
+        </person>
+    </parties>
+    <constraints>
+        <depends>
+            <package>TYPO3.FLOW3</package>
+        </depends>
+    </constraints>
+</package>
