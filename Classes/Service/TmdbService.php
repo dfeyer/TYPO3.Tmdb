@@ -201,7 +201,6 @@ class TmdbService {
 				curl_setopt($connextionHandler, CURLOPT_RETURNTRANSFER, true);
 
 				$data = curl_exec($connextionHandler);
-				var_dump($url);
 				$this->cache->set($cacheHash, $data);
 			}
 
