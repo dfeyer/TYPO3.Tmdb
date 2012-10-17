@@ -29,11 +29,6 @@ class Response {
 	protected $data = array();
 
 	/**
-	 * @var string
-	 */
-	protected $headers;
-
-	/**
 	 * @param array $error
 	 */
 	public function setError($error) {
@@ -86,20 +81,6 @@ class Response {
 	 */
 	public function getData() {
 		return $this->data;
-	}
-
-	/**
-	 * @param string $headers
-	 */
-	public function setHeaders($headers) {
-		$this->headers = $headers;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getHeaders() {
-		return $this->headers;
 	}
 
 }
