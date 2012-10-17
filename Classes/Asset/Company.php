@@ -21,6 +21,19 @@ class Company extends AbstractAsset {
 	const type = 'company';
 
 	/**
+	 * @param int $data
+	 */
+	public function __construct($data) {
+		$this->tmdbService = new \TYPO3\Tmdb\Service\TmdbService();
+
+		if (is_numeric($data)) {
+			$data = $this->tmdbService->getAssetInformations(self::type, $data);
+		}
+
+		$this->processData($data);
+	}
+
+	/**
 	 * @link http://help.themoviedb.org/kb/api/company-movies
 	 */
 	public function movies($language = null, $page = 1) {

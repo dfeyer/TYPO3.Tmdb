@@ -31,23 +31,19 @@ abstract class AbstractAsset {
 	protected $id = null;
 
 	/**
-	 * @FLOW3\Inject
 	 * @var \TYPO3\Tmdb\Service\TmdbService
 	 */
 	protected $tmdbService;
 
-	public function __construct($data) {
-		if (is_numeric($data)) {
-			$data = $this->tmdbService->getAssetInformations(self::type, $data);
-		}
-		if (is_array($data)) {
-			$data = current($data);
-			foreach ($data as $key => $value) {
-				if ($key === 'id') {
-					$this->id = $value;
-				}
-				$this->data[$key] = $value;
+	/**
+	 * @param \stdClass|array $data
+	 */
+	protected function processData($data) {
+		foreach ($data as $key => $value) {
+			if ($key === 'id') {
+				$this->id = $value;
 			}
+			$this->data[$key] = $value;
 		}
 	}
 

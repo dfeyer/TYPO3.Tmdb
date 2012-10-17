@@ -21,6 +21,19 @@ class Movie extends AbstractAsset {
 	const type = 'movie';
 
 	/**
+	 * @param int $data
+	 */
+	public function __construct($data) {
+		$this->tmdbService = new \TYPO3\Tmdb\Service\TmdbService();
+
+		if (is_numeric($data)) {
+			$data = $this->tmdbService->getAssetInformations(self::type, $data);
+		}
+
+		$this->processData($data);
+	}
+
+	/**
 	 * @link http://help.themoviedb.org/kb/api/movie-alternative-titles
 	 */
 	public function getAlternativeTitles($country=''){
@@ -59,6 +72,7 @@ class Movie extends AbstractAsset {
 			}
 		}
 
+		if ($language !== NULL)
 		$info = $this->tmdbService->getAssetInformations(self::type, $this->id, 'images', array('language'=>$language));
 		foreach($info as $type => $images){
 			if(!is_array($images)) continue;

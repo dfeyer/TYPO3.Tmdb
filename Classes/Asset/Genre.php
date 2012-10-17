@@ -25,7 +25,7 @@ class Genre extends AbstractAsset {
 			$this->data['id'] = $data;
 			$data             = $this->getList($language);
 		}
-		parent::__construct($data);
+		$this->processData($data);
 	}
 
 	/**

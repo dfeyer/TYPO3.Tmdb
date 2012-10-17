@@ -21,6 +21,19 @@ class Person extends AbstractAsset {
 	const type = 'person';
 
 	/**
+	 * @param int $data
+	 */
+	public function __construct($data) {
+		$this->tmdbService = new \TYPO3\Tmdb\Service\TmdbService();
+
+		if (is_numeric($data)) {
+			$data = $this->tmdbService->getAssetInformations(self::type, $data);
+		}
+
+		$this->processData($data);
+	}
+
+	/**
 	 * @link http://help.themoviedb.org/kb/api/person-credits
 	 */
 	public function credits($language=null){
