@@ -54,12 +54,24 @@ class TmdbService {
 	public function initializeObject() {
 		if (!isset($this->configuration)) {
 			$response = $this->sendRequest('configuration');
-			if (!$response->error) {
-				$this->configuration = $response->data;
+			if ($response->hasError()) {
+				$this->error = $response->getError();
 			} else {
-				$this->error = $response->error;
+				$this->configuration = $response->getData();
 			}
 		}
+	}
+
+	/**
+	 * @param string $type
+	 * @param object $info
+	 * @return object
+	 */
+	protected function getAssetObject($type, $info) {
+		$assetClass = ucfirst($type);
+		$assetInterface = $this->settings['asset'][$assetClass]['class'];
+
+		return $this->objectManager->get($assetInterface, array($info));
 	}
 
 	/**
@@ -74,24 +86,22 @@ class TmdbService {
 		$results = array();
 
 		$response = $this->sendRequest('search/' . $type, $params);
-		if (!$response->error) {
+		if (!$response->hasError()) {
 
-			$assetClass = ucfirst($type); // NOTE: As long as we can map the methods to the class name, this works...
-			$assetInterface = $this->settings['asset'][$assetClass]['class'];
 			$results    = array();
-			foreach ($response->data->results as $asset) {
+			foreach ($response->getData()->results as $asset) {
 				if ($expand) {
 					$info = $this->getAssetInformations($type, $asset->id);
 					if ($info) {
 						$asset = $info;
 					}
 				}
-				$results[$asset->id] = $this->objectManager->get($assetInterface, array($asset));
+				$results[$asset->id] = $this->getAssetObject($type, $asset);
 			}
 
 		} else {
 			throw new \TYPO3\Tmdb\Exception\ResponseException(
-				$response->error['code'] . ' - ' . $response->error['message'],
+				$response->getErrorAsString(),
 				1350150189
 			);
 		}
@@ -116,26 +126,24 @@ class TmdbService {
 		} else {
 			$response = $this->sendRequest($type . '/' . $id);
 		}
-		if (!$response->error) {
-			$result = $response->data;
+		if ($response->hasError()) {
+			$this->error = $response->getError();
 		} else {
-			$this->error = $response->error;
+			$result = $response->getData();
 		}
 
 		return $result;
 	}
 
 	/**
-	 * Sending requests to TMDB
-	 *
 	 * @param string $method
 	 * @param array $params
 	 * @param array $data
-	 * @return stdClass
+	 * @return \TYPO3\Tmdb\Response
 	 */
 	protected function sendRequest($method, $params = array(), $data = array()) {
 
-		$response = new \stdClass();
+		$response = new \TYPO3\Tmdb\Response();
 
 		$params = $this->paramsMerge($params);
 
@@ -147,13 +155,6 @@ class TmdbService {
 			self::apiUrlPattern
 		);
 
-		if (!extension_loaded('curl')) {
-			throw new \TYPO3\Tmdb\Exception\ResponseException(
-				'Curl extension not loaded',
-				1350153754
-			);
-		}
-
 		// Initializing curl
 		$connextionHandler = curl_init();
 		if ($connextionHandler) {
@@ -161,7 +162,7 @@ class TmdbService {
 			$headers[] = 'Accept: application/json';
 			$headers[] = 'Accept-Charset: utf-8';
 
-			if (!empty($data) && is_array($data) && count($array) > 0) {
+			if (!empty($data) && is_array($data) && count($data) > 0) {
 				$jsonData = json_encode($data, TRUE);
 				curl_setopt($connextionHandler, CURLOPT_POSTFIELDS, json_encode($data));
 				$headers[] = 'Content-Type: application/json';
@@ -173,46 +174,30 @@ class TmdbService {
 			curl_setopt($connextionHandler, CURLOPT_HEADER, false);
 			curl_setopt($connextionHandler, CURLOPT_RETURNTRANSFER, true);
 
-			$response->data = json_decode(curl_exec($connextionHandler));
-			$response->headers = curl_getinfo($connextionHandler);
+			$response->setData(json_decode(curl_exec($connextionHandler)));
+			$response->setHeaders(curl_getinfo($connextionHandler));
 
 			curl_close($connextionHandler);
 
-			if ($response->data instanceof \stdClass) {
-				if (!$this->settings['paged'] && isset($response->data->total_pages) && $response
-					->data->page < $response->data->total_pages
-				) {
-					$paged_response = $this
-						->sendRequest($method, $params + array(
-						'page' => $response->data->page + 1
+			if (empty($response->getData()->status_code)) {
+				$data = $response->getData();
+				if (!$this->settings['paged'] && isset($data->total_pages) && $data->page < $data->total_pages) {
+					$pagedResponse = $this->sendRequest($method, $params + array(
+						'page' => $data->page + 1
 					));
 
-					if (!$paged_response->error) {
-						$response->data->page        = 1;
-						$response->data->results     = array_merge($response->data->results, $paged_response
-							->data->results);
-						$response->data->total_pages = 1;
+					if (!$pagedResponse->hasError()) {
+						$this->response = array();
+						$this->error = $response->getError();
 					} else {
-						$results     = array();
-						$this->error = $response->error;
-						return $results;
+						$data->page        = 1;
+						$data->results     = array_merge($data->results, $pagedResponse->getData()->results);
+						$data->total_pages = 1;
 					}
 				}
-
-				$response->error = false;
 			} else {
-				var_dump($url);
-				throw new \TYPO3\Tmdb\Exception\ResponseException(
-					'Invalid response from TMDB',
-					1350153754
-				);
+				$response->registerError($response->getData()->status_code, $response->getData()->status_message);
 			}
-
-		} else {
-			$response->error = array(
-				'code'    => -1,
-				'message' => 'Failed to init CURL'
-			);
 		}
 
 		$this->response = $response;
