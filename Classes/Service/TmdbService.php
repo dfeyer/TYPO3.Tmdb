@@ -179,7 +179,7 @@ class TmdbService {
 
 			curl_close($connextionHandler);
 
-			if (empty($response->getData()->status_code)) {
+			if (empty($response->getData()->status_code) && $response->getData() !== NULL) {
 				$data = $response->getData();
 				if (!$this->settings['paged'] && isset($data->total_pages) && $data->page < $data->total_pages) {
 					$pagedResponse = $this->sendRequest($method, $params + array(
@@ -196,7 +196,11 @@ class TmdbService {
 					}
 				}
 			} else {
-				$response->registerError($response->getData()->status_code, $response->getData()->status_message);
+				if ($response->getData() === NULL) {
+					$response->registerError(1350512167, 'Empty response');
+				} else {
+					$response->registerError($response->getData()->status_code, $response->getData()->status_message);
+				}
 			}
 		}
 

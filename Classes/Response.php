@@ -77,7 +77,7 @@ class Response {
 	/**
 	 * @param \stdClass $data
 	 */
-	public function setData(\stdClass $data) {
+	public function setData($data) {
 		$this->data = $data;
 	}
 
