@@ -1,0 +1,2 @@
+Tmdb_TmdbCache:
+  frontend: TYPO3\FLOW3\Cache\Frontend\StringFrontend

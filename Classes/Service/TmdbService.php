@@ -32,6 +32,11 @@ class TmdbService {
 	protected $configuration;
 
 	/**
+	 * @var \TYPO3\FLOW3\Cache\Frontend\StringFrontend
+	 */
+	protected $cache;
+
+	/**
 	 * @var array
 	 */
 	protected $settings = array();
@@ -49,6 +54,16 @@ class TmdbService {
 	}
 
 	/**
+	 * Sets the foo cache
+	 *
+	 * @param \TYPO3\Flow\Cache\Frontend\StringFrontend $cache Cache for foo data
+	 * @return void
+	 */
+	public function setCache(\TYPO3\FLOW3\Cache\Frontend\StringFrontend $cache) {
+		$this->cache = $cache;
+	}
+
+	/**
 	 * Initialize object
 	 */
 	public function initializeObject() {
@@ -60,6 +75,13 @@ class TmdbService {
 				$this->configuration = $response->getData();
 			}
 		}
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getConfiguration() {
+		return $this->configuration;
 	}
 
 	/**
@@ -154,37 +176,45 @@ class TmdbService {
 			array($this->settings['api']['url'], $this->settings['api']['version'], $method, $query),
 			self::apiUrlPattern
 		);
+		$cacheHash = sha1($url);
 
 		// Initializing curl
 		$connextionHandler = curl_init();
 		if ($connextionHandler) {
-			$headers   = array();
-			$headers[] = 'Accept: application/json';
-			$headers[] = 'Accept-Charset: utf-8';
+			if ($this->cache->has($cacheHash)) {
+				$data = $this->cache->get($cacheHash);
+			} else {
+				$headers   = array();
+				$headers[] = 'Accept: application/json';
+				$headers[] = 'Accept-Charset: utf-8';
 
-			if (!empty($data) && is_array($data) && count($data) > 0) {
-				$jsonData = json_encode($data, TRUE);
-				curl_setopt($connextionHandler, CURLOPT_POSTFIELDS, json_encode($data));
-				$headers[] = 'Content-Type: application/json';
-				$headers[] = 'Content-Length: ' . strlen($jsonData);
+				if (!empty($data) && is_array($data) && count($data) > 0) {
+					$jsonData = json_encode($data, TRUE);
+					curl_setopt($connextionHandler, CURLOPT_POSTFIELDS, json_encode($data));
+					$headers[] = 'Content-Type: application/json';
+					$headers[] = 'Content-Length: ' . strlen($jsonData);
+				}
+
+				curl_setopt($connextionHandler, CURLOPT_URL, $url);
+				curl_setopt($connextionHandler, CURLOPT_HTTPHEADER, $headers);
+				curl_setopt($connextionHandler, CURLOPT_HEADER, false);
+				curl_setopt($connextionHandler, CURLOPT_RETURNTRANSFER, true);
+
+				$data = curl_exec($connextionHandler);
+				var_dump($url);
+				$this->cache->set($cacheHash, $data);
 			}
 
-			curl_setopt($connextionHandler, CURLOPT_URL, $url);
-			curl_setopt($connextionHandler, CURLOPT_HTTPHEADER, $headers);
-			curl_setopt($connextionHandler, CURLOPT_HEADER, false);
-			curl_setopt($connextionHandler, CURLOPT_RETURNTRANSFER, true);
 
-			$response->setData(json_decode(curl_exec($connextionHandler)));
-			$response->setHeaders(curl_getinfo($connextionHandler));
+
+			$response->setData(json_decode($data));
 
 			curl_close($connextionHandler);
 
 			if (empty($response->getData()->status_code) && $response->getData() !== NULL) {
 				$data = $response->getData();
 				if (!$this->settings['paged'] && isset($data->total_pages) && $data->page < $data->total_pages) {
-					$pagedResponse = $this->sendRequest($method, $params + array(
-						'page' => $data->page + 1
-					));
+					$pagedResponse = $this->sendRequest($method, $params + array('page' => $data->page + 1));
 
 					if (!$pagedResponse->hasError()) {
 						$this->response = array();
@@ -246,7 +276,7 @@ class TmdbService {
 			'language'      => $this->settings['language'],
 		);
 
-		$result = \TYPO3\FLOW3\Utility\Arrays::arrayMergeRecursiveOverrule($defaults, $params, FALSE, FALSE);
+		$result = \TYPO3\FLOW3\Utility\Arrays::arrayMergeRecursiveOverrule($defaults, $params, FALSE, TRUE);
 		$result = \TYPO3\FLOW3\Utility\Arrays::removeEmptyElementsRecursively($result);
 
 		return $result;
