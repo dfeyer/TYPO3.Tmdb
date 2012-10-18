@@ -6,4 +6,4 @@ TYPO3\Tmdb\Service\TmdbService:
         factoryMethodName: getCache
         arguments:
           1:
-            value: Tmdb_TmdbCache
+            value: TYPO3_Tmdb_Cache

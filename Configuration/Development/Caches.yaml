@@ -1,0 +1,2 @@
+TYPO3_Tmdb_Cache:
+  backend: TYPO3\FLOW3\Cache\Backend\NullBackend
