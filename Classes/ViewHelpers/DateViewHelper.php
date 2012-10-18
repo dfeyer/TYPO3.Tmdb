@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\Tmdb\ViewHelpers\Image;
+namespace TYPO3\Tmdb\ViewHelpers;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "TYPO3.Tmdb".                 *
@@ -11,33 +11,35 @@ namespace TYPO3\Tmdb\ViewHelpers\Image;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\FLOW3\Annotations as FLOW3;
 
 /**
- * Display Backdrop Thumbnail
+ * Get release date by country
  *
  * @api
  */
-class PostersViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
+class DateViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\Tmdb\Service\TmdbService
+	 * @var array
 	 */
-	protected $tmdbService;
+	protected $settings;
 
 	/**
-	 * @param \TYPO3\Tmdb\Asset\Movie $movie
-	 * @return string Rendered URI
-	 * @api
+	 * @param array $settings
 	 */
-	public function render(\TYPO3\Tmdb\Asset\Movie $movie) {
-		$output = '';
-		$images = $movie->getImages('fr;;null', 'w185')->posters;
-		foreach ($images as $image) {
-			$output .= '<img src="' . $image->file_path . '">';
-		}
-		return $output;
+	public function injectSettings(array $settings) {
+		$this->settings = $settings;
+	}
+
+	/**
+	 * @param string $date
+	 * @param string $format
+	 * @return string
+	 */
+	public function render($date, $format = 'd.m.Y') {
+		$dateObject = new \DateTime();
+		$dateObject->createFromFormat('Y-m-d', $date);
+		return $dateObject->format($format);
 	}
 }
 

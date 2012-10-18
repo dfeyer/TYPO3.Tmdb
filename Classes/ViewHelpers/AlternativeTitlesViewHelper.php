@@ -1,5 +1,5 @@
 <?php
-namespace TYPO3\Tmdb\ViewHelpers\Image;
+namespace TYPO3\Tmdb\ViewHelpers;
 
 /*                                                                        *
  * This script belongs to the FLOW3 package "TYPO3.Tmdb".                 *
@@ -11,32 +11,43 @@ namespace TYPO3\Tmdb\ViewHelpers\Image;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\FLOW3\Annotations as FLOW3;
 
 /**
- * Display Backdrop Thumbnail
+ * A view helper for creating links to TMDb asset page
  *
  * @api
  */
-class BackdropsViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
+class AlternativeTitlesViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\Tmdb\Service\TmdbService
+	 * @var array
 	 */
-	protected $tmdbService;
+	protected $settings;
+
+	/**
+	 * @param array $settings
+	 */
+	public function injectSettings(array $settings) {
+		$this->settings = $settings;
+	}
 
 	/**
 	 * @param \TYPO3\Tmdb\Asset\Movie $movie
-	 * @return string Rendered URI
-	 * @api
+	 * @param string $country
+	 * @return string
 	 */
-	public function render(\TYPO3\Tmdb\Asset\Movie $movie) {
-		$output = '';
-		$images = $movie->getImages('fr;;null', 'w300')->backdrops;
-		foreach ($images as $image) {
-			$output .= '<img src="' . $image->file_path . '">';
+	public function render(\TYPO3\Tmdb\Asset\Movie $movie, $country = null) {
+		$titles = $movie->getAlternativeTitles($country);
+		$output = array();
+		foreach ($titles as $title) {
+			$output[] = $title->title;
 		}
+
+		$output = implode(', ', $output);
+		if (trim($output) === '') {
+			$output = '-';
+		}
+
 		return $output;
 	}
 }
