@@ -93,7 +93,7 @@ class TmdbService {
 		$assetClass = ucfirst($type);
 		$assetInterface = $this->settings['asset'][$assetClass]['class'];
 
-		return $this->objectManager->get($assetInterface, array($info));
+		return $this->objectManager->get($assetInterface, $info);
 	}
 
 	/**
@@ -201,7 +201,9 @@ class TmdbService {
 				curl_setopt($connextionHandler, CURLOPT_RETURNTRANSFER, true);
 
 				$data = curl_exec($connextionHandler);
-				$this->cache->set($cacheHash, $data);
+				if ($data) {
+					$this->cache->set($cacheHash, $data);
+				}
 			}
 
 
@@ -285,7 +287,7 @@ class TmdbService {
 		$result = $array;
 		foreach ($result as $key => $value) {
 			if (is_array($value)) {
-				$result[$key] = self::removeEmptyElementsRecursively($value);
+				$result[$key] = $this->removeEmptyElementsRecursively($value);
 				if ($result[$key] === array()) {
 					unset($result[$key]);
 				}
