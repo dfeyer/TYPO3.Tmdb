@@ -21,11 +21,6 @@ abstract class AbstractAsset {
 	const type = 'abstract';
 
 	/**
-	 * @var array
-	 */
-	protected $data = array();
-
-	/**
 	 * @var int
 	 */
 	protected $id = null;
@@ -36,14 +31,18 @@ abstract class AbstractAsset {
 	protected $tmdbService;
 
 	/**
-	 * @param \stdClass|array $data
+	 * @param int $data
 	 */
-	protected function processData($data) {
+	public function __construct($data) {
+		$this->tmdbService = new \TYPO3\Tmdb\Service\TmdbService();
+
+		if (is_numeric($data)) {
+			$data = $this->tmdbService->getAssetInformations(self::type, $data);
+		}
+
 		foreach ($data as $key => $value) {
-			if ($key === 'id') {
-				$this->id = $value;
-			}
-			$this->data[$key] = $value;
+			$propertyName = \TYPO3\Tmdb\Utility\Strings::underscoredToLowerCamelCase($key);
+			\TYPO3\FLOW3\Reflection\ObjectAccess::setProperty($this, $propertyName, $value);
 		}
 	}
 
@@ -59,13 +58,6 @@ abstract class AbstractAsset {
 	 */
 	public function getId() {
 		return $this->id;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getData() {
-		return $this->data;
 	}
 
 	/**
