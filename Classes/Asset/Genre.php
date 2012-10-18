@@ -20,14 +20,6 @@ class Genre extends AbstractAsset {
 
 	const type = 'genre';
 
-	public function __construct($data, $language = null) {
-		if (is_numeric($data)) {
-			$this->data['id'] = $data;
-			$data             = $this->getList($language);
-		}
-		$this->processData($data);
-	}
-
 	/**
 	 * @link http://help.themoviedb.org/kb/api/genre-list
 	 */

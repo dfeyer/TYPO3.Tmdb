@@ -21,19 +21,6 @@ class Collection extends AbstractAsset {
 	const type = 'collection';
 
 	/**
-	 * @param int $data
-	 */
-	public function __construct($data) {
-		$this->tmdbService = new \TYPO3\Tmdb\Service\TmdbService();
-
-		if (is_numeric($data)) {
-			$data = $this->tmdbService->getAssetInformations(self::type, $data);
-		}
-
-		$this->processData($data);
-	}
-
-	/**
 	 * Retrieve the parts as Movie objects
 	 * @link http://help.themoviedb.org/kb/api/collection-info
 	 */
