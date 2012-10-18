@@ -18,8 +18,6 @@ use TYPO3\FLOW3\Annotations as FLOW3;
  */
 abstract class AbstractAsset {
 
-	const type = 'abstract';
-
 	/**
 	 * @var int
 	 */
@@ -37,7 +35,7 @@ abstract class AbstractAsset {
 		$this->tmdbService = new \TYPO3\Tmdb\Service\TmdbService();
 
 		if (is_numeric($data)) {
-			$data = $this->tmdbService->getAssetInformations(self::type, $data);
+			$data = $this->tmdbService->getAssetInformations(static::type, $data);
 		}
 
 		foreach ($data as $key => $value) {
