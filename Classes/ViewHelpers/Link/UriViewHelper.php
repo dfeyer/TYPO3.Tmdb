@@ -20,13 +20,32 @@ namespace TYPO3\Tmdb\ViewHelpers\Link;
 class UriViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 
 	/**
+	 * @var array
+	 */
+	protected $settings;
+
+	/**
+	 * @param array $settings
+	 */
+	public function injectSettings(array $settings) {
+		$this->settings = $settings;
+	}
+
+	/**
 	 * @param int $asset the identifier of the asset
 	 * @param string $type the type of the asset
 	 * @return string Rendered URI
 	 * @api
 	 */
 	public function render($asset, $type) {
+		$params = '';
+		if (!empty($this->settings['language'])) {
+			$params = 'language=' . urlencode($this->settings['language']);
+		}
 		$uri = 'http://www.themoviedb.org/' . $type . '/' . $asset;
+		if (trim($params) !== '') {
+			$uri .= '?' . $params;
+		}
 
 		return $uri;
 	}
