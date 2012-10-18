@@ -276,8 +276,23 @@ class TmdbService {
 		);
 
 		$result = \TYPO3\FLOW3\Utility\Arrays::arrayMergeRecursiveOverrule($defaults, $params, FALSE, TRUE);
-		$result = \TYPO3\FLOW3\Utility\Arrays::removeEmptyElementsRecursively($result);
+		$result = $this->removeEmptyElementsRecursively($result);
 
+		return $result;
+	}
+
+	protected function removeEmptyElementsRecursively(array $array) {
+		$result = $array;
+		foreach ($result as $key => $value) {
+			if (is_array($value)) {
+				$result[$key] = self::removeEmptyElementsRecursively($value);
+				if ($result[$key] === array()) {
+					unset($result[$key]);
+				}
+			} elseif (trim($value) === '') {
+				unset($result[$key]);
+			}
+		}
 		return $result;
 	}
 
