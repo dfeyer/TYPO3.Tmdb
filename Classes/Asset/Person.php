@@ -21,6 +21,21 @@ class Person extends AbstractAsset {
 	const type = 'person';
 
 	/**
+	 * @var string
+	 */
+	protected $name;
+
+	/**
+	 * @var string
+	 */
+	protected $character;
+
+	/**
+	 * @var string
+	 */
+	protected $department;
+
+	/**
 	 * @link http://help.themoviedb.org/kb/api/person-credits
 	 */
 	public function credits($language=null){
@@ -52,6 +67,48 @@ class Person extends AbstractAsset {
 	 */
 	public function profile($size=false) {
 		return $this->getImageUrl('profile', $size);
+	}
+
+	/**
+	 * @param string $name
+	 */
+	public function setName($name) {
+		$this->name = $name;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName() {
+		return $this->name;
+	}
+
+	/**
+	 * @param string $character
+	 */
+	public function setCharacter($character) {
+		$this->character = $character;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCharacter() {
+		return $this->character;
+	}
+
+	/**
+	 * @param string $department
+	 */
+	public function setDepartment($department) {
+		$this->department = $department;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getDepartment() {
+		return $this->department;
 	}
 
 }

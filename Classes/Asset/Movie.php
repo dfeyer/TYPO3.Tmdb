@@ -31,6 +31,36 @@ class Movie extends AbstractAsset {
 	/**
 	 * @var string
 	 */
+	protected $imdbId;
+
+	/**
+	 * @var \stdClass
+	 */
+	protected $belongToCollection;
+
+	/**
+	 * @var int
+	 */
+	protected $budget;
+
+	/**
+	 * @var array
+	 */
+	protected $genres;
+
+	/**
+	 * @var string
+	 */
+	protected $homepage;
+
+	/**
+	 * @var string
+	 */
+	protected $overview;
+
+	/**
+	 * @var string
+	 */
 	protected $backdropPath;
 
 	/**
@@ -47,6 +77,16 @@ class Movie extends AbstractAsset {
 	 * @var string
 	 */
 	protected $title;
+
+	/**
+	 * @var array
+	 */
+	protected $alternativeTitles;
+
+	/**
+	 * @var string
+	 */
+	protected $tagline;
 
 	/**
 	 * @var \DateTime
@@ -69,6 +109,37 @@ class Movie extends AbstractAsset {
 	protected $voteCount;
 
 	/**
+	 * @var array
+	 */
+	protected $productionCompany;
+
+	/**
+	 * @var array
+	 */
+	protected $productionCountries;
+
+	/**
+	 * @var int
+	 */
+	protected $revenue;
+
+	/**
+	 * @var int
+	 */
+	protected $runtime;
+
+	/**
+	 * @var array
+	 */
+	protected $spokenLanguages;
+
+	/**
+	 * @var string
+	 */
+	protected $status;
+
+
+	/**
 	 * Get alternative titles
 	 *
 	 * @param string $country
@@ -76,8 +147,10 @@ class Movie extends AbstractAsset {
 	 * @link http://help.themoviedb.org/kb/api/movie-alternative-titles
 	 */
 	public function getAlternativeTitles($country = ''){
-		return $this->tmdbService->getAssetInformations(self::type, $this->id, 'alternative_titles', array('country'=>$country));
+		$alternativeTitles = $this->tmdbService->getAssetInformations(self::type, $this->id, 'alternative_titles', array('country'=>$country));
+		$this->alternativeTitles = $alternativeTitles->titles;
 
+		return $this->alternativeTitles;
 	}
 
 	/**
@@ -96,6 +169,45 @@ class Movie extends AbstractAsset {
 			}
 		}
 		return $casts;
+	}
+
+	/**
+	 * Get the cast filtered by type
+	 *
+	 * @param string $type
+	 * @return array
+	 * @link http://help.themoviedb.org/kb/api/movie-casts
+	 */
+	protected function getCastsByType($type){
+		$casts = array();
+		$info = $this->tmdbService->getAssetInformations(self::type, $this->id, 'casts');
+		foreach($info as $group => $persons){
+			if(!is_array($persons) || $group !== $type) continue;
+			foreach($persons as $index => $person){
+				$casts[$person->id] = new Person($person);
+			}
+		}
+		return $casts;
+	}
+
+	/**
+	 * Get the actors only
+	 *
+	 * @return array
+	 * @link http://help.themoviedb.org/kb/api/movie-casts
+	 */
+	public function getActors(){
+		return $this->getCastsByType('cast');
+	}
+
+	/**
+	 * Get the actors only
+	 *
+	 * @return array
+	 * @link http://help.themoviedb.org/kb/api/movie-casts
+	 */
+	public function getCrews(){
+		return $this->getCastsByType('crew');
 	}
 
 	/**
@@ -121,7 +233,6 @@ class Movie extends AbstractAsset {
 			}
 		}
 
-		if ($language !== NULL)
 		$info = $this->tmdbService->getAssetInformations(self::type, $this->id, 'images', array('language'=>$language));
 		foreach($info as $type => $images){
 			if(!is_array($images)) continue;
@@ -151,18 +262,29 @@ class Movie extends AbstractAsset {
 	/**
 	 * Get releases dates
 	 *
+	 * @param string $country
 	 * @link http://help.themoviedb.org/kb/api/movie-release-info
 	 */
-	public function getReleases(){
-		return $this->tmdbService->getAssetInformations(self::type, $this->id, 'releases');
+	public function getReleases($country = null){
+		$releases = $this->tmdbService->getAssetInformations(self::type, $this->id, 'releases');
+		if ($country !== null) {
+			foreach ($releases->countries as $release) {
+				if ($release->iso_3166_1 === $country) {
+					return $release;
+				}
+			}
+		} else {
+			return $releases;
+		}
 	}
 
 	/**
 	 * Get the trailer
 	 *
+	 * @param string $language
 	 * @link http://help.themoviedb.org/kb/api/movie-trailers
 	 */
-	public function getTrailers($language=null){
+	public function getTrailers($language = null){
 		return $this->tmdbService->getAssetInformations(self::type, $this->id, 'trailers', array('language'=>$language));
 	}
 
@@ -178,9 +300,11 @@ class Movie extends AbstractAsset {
 	/**
 	 * Get similar movies
 	 *
+	 * @param string $language
+	 * @param int $page
 	 * @link http://help.themoviedb.org/kb/api/movie-similar-movies
 	 */
-	public function getSimilarMovies($language=null, $page=1){
+	public function getSimilarMovies($language = null, $page = 1){
 		$movies = array();
 		$info = $this->tmdbService->getAssetInformations(self::type, $this->id, 'similar_movies', array('language'=>$language, 'page'=>$page));
 		foreach($info->results as $index => $movie){
@@ -371,6 +495,188 @@ class Movie extends AbstractAsset {
 	 */
 	public function getVoteCount() {
 		return $this->voteCount;
+	}
+
+	/**
+	 * @param string $imdbId
+	 */
+	public function setImdbId($imdbId) {
+		$this->imdbId = $imdbId;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getImdbId() {
+		return $this->imdbId;
+	}
+
+	/**
+	 * @param string $overview
+	 */
+	public function setOverview($overview) {
+		$this->overview = $overview;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getOverview() {
+		return $this->overview;
+	}
+
+	/**
+	 * @param \stdClass $belongToCollection
+	 */
+	public function setBelongToCollection($belongToCollection) {
+		$this->belongToCollection = $belongToCollection;
+	}
+
+	/**
+	 * @return \stdClass
+	 */
+	public function getBelongToCollection() {
+		return $this->belongToCollection;
+	}
+
+	/**
+	 * @param int $budget
+	 */
+	public function setBudget($budget) {
+		$this->budget = $budget;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getBudget() {
+		return $this->budget;
+	}
+
+	/**
+	 * @param array $genres
+	 */
+	public function setGenres($genres) {
+		$this->genres = $genres;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getGenres() {
+		return $this->genres;
+	}
+
+	/**
+	 * @param string $homepage
+	 */
+	public function setHomepage($homepage) {
+		$this->homepage = $homepage;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getHomepage() {
+		return $this->homepage;
+	}
+
+	/**
+	 * @param array $productionCompany
+	 */
+	public function setProductionCompany($productionCompany) {
+		$this->productionCompany = $productionCompany;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getProductionCompany() {
+		return $this->productionCompany;
+	}
+
+	/**
+	 * @param array $productionCountries
+	 */
+	public function setProductionCountries($productionCountries) {
+		$this->productionCountries = $productionCountries;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getProductionCountries() {
+		return $this->productionCountries;
+	}
+
+	/**
+	 * @param int $revenue
+	 */
+	public function setRevenue($revenue) {
+		$this->revenue = $revenue;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getRevenue() {
+		return $this->revenue;
+	}
+
+	/**
+	 * @param int $runtime
+	 */
+	public function setRuntime($runtime) {
+		$this->runtime = $runtime;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getRuntime() {
+		return $this->runtime;
+	}
+
+	/**
+	 * @param array $spokenLanguage
+	 */
+	public function setSpokenLanguages($spokenLanguage) {
+		$this->spokenLanguages = $spokenLanguage;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getSpokenLanguages() {
+		return $this->spokenLanguages;
+	}
+
+	/**
+	 * @param string $status
+	 */
+	public function setStatus($status) {
+		$this->status = $status;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getStatus() {
+		return $this->status;
+	}
+
+	/**
+	 * @param string $tagline
+	 */
+	public function setTagline($tagline) {
+		$this->tagline = $tagline;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTagline() {
+		return $this->tagline;
 	}
 
 }
