@@ -176,7 +176,7 @@ class TmdbService {
 			array($this->settings['api']['url'], $this->settings['api']['version'], $method, $query),
 			self::apiUrlPattern
 		);
-		$cacheHash = md5($url);
+		$cacheHash = sha1($url);
 
 		// Initializing curl
 		$connextionHandler = curl_init();
