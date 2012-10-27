@@ -56,7 +56,7 @@ class TmdbService {
 	/**
 	 * Sets the foo cache
 	 *
-	 * @param \TYPO3\Flow\Cache\Frontend\StringFrontend $cache Cache for foo data
+	 * @param \TYPO3\FLOW3\Cache\Frontend\StringFrontend $cache Cache for foo data
 	 * @return void
 	 */
 	public function setCache(\TYPO3\FLOW3\Cache\Frontend\StringFrontend $cache) {
@@ -176,7 +176,7 @@ class TmdbService {
 			array($this->settings['api']['url'], $this->settings['api']['version'], $method, $query),
 			self::apiUrlPattern
 		);
-		$cacheHash = sha1($url);
+		$cacheHash = md5($url);
 
 		// Initializing curl
 		$connextionHandler = curl_init();
