@@ -1,1 +1,15 @@
-{"name":"typo3\/tmdb","type":"typo3-flow-package","description":"This package allow the usage of TMDB database. You need a personal API key to use the API. Please check the condition on the TMDB website.","version":"0.1.0-dev","require":{"typo3\/flow":"*"},"autoload":{"psr-0":{"TYPO3\\Tmdb":"Classes"}}}
+{
+	"name": "typo3/tmdb",
+	"type": "typo3-flow-package",
+	"description": "This package allow the usage of TMDB database. You need a personal API key to use the API. Please check the condition on the TMDB website.",
+	"version": "0.1.0-dev",
+	"require": {
+		"typo3/flow": "*",
+		"typo3/guzzle": "*"
+	},
+	"autoload": {
+		"psr-0": {
+			"TYPO3\\Tmdb": "Classes"
+		}
+	}
+}
