@@ -11,18 +11,18 @@ namespace TYPO3\Tmdb\Service;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\FLOW3\Annotations as FLOW3;
+use TYPO3\Flow\Annotations as Flow;
 
 /**
- * @FLOW3\Scope("singleton")
+ * @Flow\Scope("singleton")
  */
 class TmdbService {
 
 	const apiUrlPattern = '@url/@version/@method?@query';
 
 	/**
-	 * @FLOW3\Inject
-	 * @var \TYPO3\FLOW3\Object\ObjectManagerInterface
+	 * @Flow\Inject
+	 * @var \TYPO3\Flow\Object\ObjectManagerInterface
 	 */
 	protected $objectManager;
 
@@ -32,7 +32,7 @@ class TmdbService {
 	protected $configuration;
 
 	/**
-	 * @var \TYPO3\FLOW3\Cache\Frontend\StringFrontend
+	 * @var \TYPO3\Flow\Cache\Frontend\StringFrontend
 	 */
 	protected $cache;
 
@@ -56,10 +56,10 @@ class TmdbService {
 	/**
 	 * Sets the foo cache
 	 *
-	 * @param \TYPO3\FLOW3\Cache\Frontend\StringFrontend $cache Cache for foo data
+	 * @param \TYPO3\Flow\Cache\Frontend\StringFrontend $cache Cache for foo data
 	 * @return void
 	 */
-	public function setCache(\TYPO3\FLOW3\Cache\Frontend\StringFrontend $cache) {
+	public function setCache(\TYPO3\Flow\Cache\Frontend\StringFrontend $cache) {
 		$this->cache = $cache;
 	}
 
@@ -277,7 +277,7 @@ class TmdbService {
 			'language'      => $this->settings['language'],
 		);
 
-		$result = \TYPO3\FLOW3\Utility\Arrays::arrayMergeRecursiveOverrule($defaults, $params, FALSE, TRUE);
+		$result = \TYPO3\Flow\Utility\Arrays::arrayMergeRecursiveOverrule($defaults, $params, FALSE, TRUE);
 		$result = $this->removeEmptyElementsRecursively($result);
 
 		return $result;

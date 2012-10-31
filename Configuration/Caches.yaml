@@ -1,4 +1,4 @@
 TYPO3_Tmdb_Cache:
-  frontend: TYPO3\FLOW3\Cache\Frontend\StringFrontend
+  frontend: TYPO3\Flow\Cache\Frontend\StringFrontend
   backendOptions:
     defaultLifetime: 3600

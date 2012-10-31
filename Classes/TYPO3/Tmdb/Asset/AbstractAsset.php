@@ -11,7 +11,7 @@ namespace TYPO3\Tmdb\Asset;
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
 
-use TYPO3\FLOW3\Annotations as FLOW3;
+use TYPO3\Flow\Annotations as Flow;
 
 /**
  * Asset Interface
@@ -40,7 +40,7 @@ abstract class AbstractAsset {
 
 		foreach ($data as $key => $value) {
 			$propertyName = \TYPO3\Tmdb\Utility\Strings::underscoredToLowerCamelCase($key);
-			\TYPO3\FLOW3\Reflection\ObjectAccess::setProperty($this, $propertyName, $value);
+			\TYPO3\Flow\Reflection\ObjectAccess::setProperty($this, $propertyName, $value);
 		}
 	}
 
