@@ -5,7 +5,7 @@
 	"version": "0.1.0-dev",
 	"require": {
 		"typo3/flow": "*",
-		"guzzle/guzzle": "3.0.*"
+		"typo3/guzzle": "*"
 	},
 	"autoload": {
 		"psr-0": {
