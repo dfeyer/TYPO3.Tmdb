@@ -263,7 +263,7 @@ class Movie extends AbstractAsset {
 	 * Get releases dates
 	 *
 	 * @param string $country
-	 * @link http://help.themoviedb.org/kb/api/movie-release-info
+	 * @return array
 	 */
 	public function getReleases($country = null){
 		$releases = $this->tmdbService->getAssetInformations(self::type, $this->id, 'releases');
