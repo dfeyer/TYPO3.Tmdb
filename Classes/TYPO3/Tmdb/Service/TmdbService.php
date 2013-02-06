@@ -97,29 +97,31 @@ class TmdbService {
 	}
 
 	/**
-	 * Search
-	 *
 	 * @param string $type
 	 * @param array $params
 	 * @param bool $expand
+	 * @param int $limit
 	 * @return array
+	 * @throws \TYPO3\Tmdb\Exception\ResponseException
 	 */
-	public function search($type, $params, $expand = false) {
-		$results = array();
-
+	public function search($type, $params, $expand = FALSE, $limit = 10) {
 		$response = $this->sendRequest('search/' . $type, $params);
 		if (!$response->hasError()) {
 
-			$results    = array();
-			foreach ($response->getData()->results as $asset) {
-				if ($expand) {
-					$info = $this->getAssetInformations($type, $asset->id);
-					if ($info) {
-						$asset = $info;
+			if (count($response->getData()->results) <= $limit) {
+				$results    = array();
+				foreach ($response->getData()->results as $asset) {
+					if ($expand) {
+						$info = $this->getAssetInformations($type, $asset->id);
+						if ($info) {
+							$asset = $info;
+						}
 					}
+					$results[$asset->id] = $this->getAssetObject($type, $asset);
 				}
-				$results[$asset->id] = $this->getAssetObject($type, $asset);
 			}
+
+			return $results;
 
 		} else {
 			throw new \TYPO3\Tmdb\Exception\ResponseException(
@@ -127,8 +129,6 @@ class TmdbService {
 				1350150189
 			);
 		}
-
-		return $results;
 	}
 
 	/**
@@ -206,15 +206,14 @@ class TmdbService {
 				}
 			}
 
-
-
 			$response->setData(json_decode($data));
 
 			curl_close($connextionHandler);
 
 			if (empty($response->getData()->status_code) && $response->getData() !== NULL) {
 				$data = $response->getData();
-				if (!$this->settings['paged'] && isset($data->total_pages) && $data->page < $data->total_pages) {
+				// Todo add parameter to set max limit
+				if (!$this->settings['paged'] && isset($data->total_pages) && $data->page < 2) {
 					$pagedResponse = $this->sendRequest($method, $params + array('page' => $data->page + 1));
 
 					if (!$pagedResponse->hasError()) {
