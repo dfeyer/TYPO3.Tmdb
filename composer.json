@@ -6,7 +6,7 @@
     "license": ["LGPL-3.0+"],
 	"require": {
 		"typo3/flow": "*",
-		"typo3/guzzle": "*"
+		"guzzle/guzzle": "3.7.1"
 	},
 	"autoload": {
 		"psr-0": {
