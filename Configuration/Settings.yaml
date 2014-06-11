@@ -2,7 +2,7 @@ TYPO3:
   Flow:
     object:
       excludeClasses:
-       'guzzle.guzzle' : ['.*']
+       'guzzle.guzzle': ['.*']
   Tmdb:
     api:
       key: "your-api-key"
