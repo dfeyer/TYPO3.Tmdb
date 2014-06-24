@@ -1,25 +1,27 @@
+
 TYPO3:
   Flow:
     object:
       excludeClasses:
-       'guzzle.guzzle': ['.*']
+       'guzzle.guzzle': [ '.*' ]
+
   Tmdb:
     api:
-      key: "your-api-key"
-      url: "http://api.themoviedb.org"
+      key: 'your-api-key'
+      url: 'http://api.themoviedb.org'
       version: 3
     include_adult: TRUE
-    language: "fr"
+    language: 'fr'
     paged: FALSE
     debug: FALSE
     asset:
       Movie:
-        class: "TYPO3\Tmdb\Asset\Movie"
+        class: 'TYPO3\Tmdb\Asset\Movie'
       Person:
-        class: "TYPO3\Tmdb\Asset\Person"
+        class: 'TYPO3\Tmdb\Asset\Person'
       Collection:
-        class: "TYPO3\Tmdb\Asset\Collection"
+        class: 'TYPO3\Tmdb\Asset\Collection'
       Company:
-        class: "TYPO3\Tmdb\Asset\Company"
+        class: 'TYPO3\Tmdb\Asset\Company'
       Genre:
-        class: "TYPO3\Tmdb\Asset\Genre"
+        class: 'TYPO3\Tmdb\Asset\Genre'
