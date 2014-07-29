@@ -97,6 +97,16 @@ class TmdbService {
 	}
 
 	/**
+	 * @param string $title
+	 * @return array
+	 */
+	public function searchByTitle($title) {
+		return $this->search('movie', array(
+			'query' => trim($title)
+		));
+	}
+
+	/**
 	 * @param string $type
 	 * @param array $params
 	 * @param bool $expand
