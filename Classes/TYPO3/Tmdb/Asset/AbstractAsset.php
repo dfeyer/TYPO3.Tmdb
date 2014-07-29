@@ -12,47 +12,49 @@ namespace TYPO3\Tmdb\Asset;
  *                                                                        */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Reflection\ObjectAccess;
+use TYPO3\Tmdb\Service\TmdbService;
+use TYPO3\Tmdb\Utility\Strings;
 
 /**
- * Asset Interface
+ * Abstract Asset
  */
 abstract class AbstractAsset {
 
 	/**
-	 * @var int
+	 * @var integer
 	 */
 	protected $id = null;
 
 	/**
-	 * @var \TYPO3\Tmdb\Service\TmdbService
+	 * @var TmdbService
 	 */
 	protected $tmdbService;
 
 	/**
-	 * @param int $data
+	 * @param integer $data
 	 */
 	public function __construct($data) {
-		$this->tmdbService = new \TYPO3\Tmdb\Service\TmdbService();
-
+		$this->tmdbService = new TmdbService();
 		if (is_numeric($data)) {
 			$data = $this->tmdbService->getAssetInformations(static::type, $data);
 		}
 
 		foreach ($data as $key => $value) {
-			$propertyName = \TYPO3\Tmdb\Utility\Strings::underscoredToLowerCamelCase($key);
-			\TYPO3\Flow\Reflection\ObjectAccess::setProperty($this, $propertyName, $value);
+			$propertyName = Strings::underscoredToLowerCamelCase($key);
+			ObjectAccess::setProperty($this, $propertyName, $value);
 		}
 	}
 
 	/**
-	 * @param int $id
+	 * @param integer $id
 	 */
 	public function setId($id) {
-		$this->id = (int)$id;
+		$this->id = (integer)$id;
 	}
 
 	/**
-	 * @return int
+	 * @return integer
 	 */
 	public function getId() {
 		return $this->id;
@@ -62,17 +64,17 @@ abstract class AbstractAsset {
 	 * Get an image base method
 	 *
 	 * @param string $type backdrop, poster, profile, logo, ...
-	 * @param string $size integer or preset name
-	 * @param bool   $random
+	 * @param bool|string $size integer or preset name
+	 * @param bool $random
 	 * @param string $language optional language to return the image in
+	 * @return string
 	 */
-	public function getImageUrl($type, $size = false, $random = false, $language = null) {
-		$image    = false;
-		$typeset  = $type . 's'; // multiple
+	public function getImageUrl($type, $size = FALSE, $random = FALSE, $language = NULL) {
+		$image    = NULL;
+		$typeset  = $type . 's';
 		$path_key = $type . '_path';
 
-		// Todo create a specific helper for this
-		if ($random) {
+		if ($random === TRUE) {
 			$images = $this->getImages($language, false);
 			if (count($images) > 1) {
 				$index             = rand(0, count($images->{$typeset}) - 1);
@@ -91,5 +93,3 @@ abstract class AbstractAsset {
 		return $image;
 	}
 }
-
-?>

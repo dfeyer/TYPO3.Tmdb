@@ -14,7 +14,7 @@ namespace TYPO3\Tmdb\Asset;
 use TYPO3\Flow\Annotations as Flow;
 
 /**
- * Collection Interface
+ * Collection
  */
 class Collection extends AbstractAsset {
 

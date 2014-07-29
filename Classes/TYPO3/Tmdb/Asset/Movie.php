@@ -14,17 +14,17 @@ namespace TYPO3\Tmdb\Asset;
 use TYPO3\Flow\Annotations as Flow;
 
 /**
- * Collection Interface
+ * Movie
  */
 class Movie extends AbstractAsset {
 
 	/**
-	 * Asset type
+	 * @var string
 	 */
 	const type = 'movie';
 
 	/**
-	 * @var bool
+	 * @var boolean
 	 */
 	protected $adult;
 
@@ -39,7 +39,7 @@ class Movie extends AbstractAsset {
 	protected $belongToCollection;
 
 	/**
-	 * @var int
+	 * @var integer
 	 */
 	protected $budget;
 
@@ -89,7 +89,7 @@ class Movie extends AbstractAsset {
 	protected $tagline;
 
 	/**
-	 * @var \DateTime
+	 * @var string
 	 */
 	protected $releaseDate;
 
@@ -104,7 +104,7 @@ class Movie extends AbstractAsset {
 	protected $voteAverage;
 
 	/**
-	 * @var int
+	 * @var integer
 	 */
 	protected $voteCount;
 
@@ -119,12 +119,12 @@ class Movie extends AbstractAsset {
 	protected $productionCountries;
 
 	/**
-	 * @var int
+	 * @var integer
 	 */
 	protected $revenue;
 
 	/**
-	 * @var int
+	 * @var integer
 	 */
 	protected $runtime;
 
@@ -452,7 +452,16 @@ class Movie extends AbstractAsset {
 	 * @return \DateTime
 	 */
 	public function getReleaseDate() {
-		return $this->releaseDate;
+		$date = \DateTime::createFromFormat('!Y-m-d', $this->releaseDate);
+		return $date ?: NULL;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getReleaseYear() {
+		$date = \DateTime::createFromFormat('!Y-m-d', $this->releaseDate);
+		return $date ? $date->format('Y') : NULL;
 	}
 
 	/**
@@ -466,7 +475,7 @@ class Movie extends AbstractAsset {
 	 * @return string
 	 */
 	public function getTitle() {
-		return $this->title;
+		return $this->title !== $this->originalTitle ? $this->title : NULL;
 	}
 
 	/**

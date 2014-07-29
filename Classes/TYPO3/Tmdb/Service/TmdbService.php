@@ -12,17 +12,24 @@ namespace TYPO3\Tmdb\Service;
  *                                                                        */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Flow\Cache\Frontend\StringFrontend;
+use TYPO3\Flow\Object\ObjectManagerInterface;
+use TYPO3\Flow\Utility\Arrays;
+use TYPO3\Tmdb\Exception\ResponseException;
 
 /**
  * @Flow\Scope("singleton")
  */
 class TmdbService {
 
+	/**
+	 * @var string
+	 */
 	const apiUrlPattern = '@url/@version/@method?@query';
 
 	/**
 	 * @Flow\Inject
-	 * @var \TYPO3\Flow\Object\ObjectManagerInterface
+	 * @var ObjectManagerInterface
 	 */
 	protected $objectManager;
 
@@ -32,7 +39,7 @@ class TmdbService {
 	protected $configuration;
 
 	/**
-	 * @var \TYPO3\Flow\Cache\Frontend\StringFrontend
+	 * @var StringFrontend
 	 */
 	protected $cache;
 
@@ -42,11 +49,10 @@ class TmdbService {
 	protected $settings = array();
 
 	protected $error;
+
 	protected $response;
 
 	/**
-	 * Inject package settings
-	 *
 	 * @param array $settigns
 	 */
 	public function injectSettings(array $settigns) {
@@ -54,12 +60,10 @@ class TmdbService {
 	}
 
 	/**
-	 * Sets the foo cache
-	 *
-	 * @param \TYPO3\Flow\Cache\Frontend\StringFrontend $cache Cache for foo data
+	 * @param StringFrontend $cache Cache for foo data
 	 * @return void
 	 */
-	public function setCache(\TYPO3\Flow\Cache\Frontend\StringFrontend $cache) {
+	public function setCache(StringFrontend $cache) {
 		$this->cache = $cache;
 	}
 
@@ -109,10 +113,10 @@ class TmdbService {
 	/**
 	 * @param string $type
 	 * @param array $params
-	 * @param bool $expand
-	 * @param int $limit
+	 * @param boolean $expand
+	 * @param integer $limit
 	 * @return array
-	 * @throws \TYPO3\Tmdb\Exception\ResponseException
+	 * @throws ResponseException
 	 */
 	public function search($type, $params, $expand = FALSE, $limit = 10) {
 		$response = $this->sendRequest('search/' . $type, $params);
@@ -134,7 +138,7 @@ class TmdbService {
 			return $results;
 
 		} else {
-			throw new \TYPO3\Tmdb\Exception\ResponseException(
+			throw new ResponseException(
 				$response->getErrorAsString(),
 				1350150189
 			);
@@ -145,13 +149,13 @@ class TmdbService {
 	 * Asset information API
 	 *
 	 * @param string $type
-	 * @param int $id
+	 * @param integer $id
 	 * @param bool $method
 	 * @param array $params
 	 * @return array
 	 * @api
 	 */
-	public function getAssetInformations($type, $id, $method = false, $params = array()) {
+	public function getAssetInformations($type, $id, $method = FALSE, $params = array()) {
 		$result = array();
 		if ($method) {
 			$response = $this->sendRequest($type . '/' . $id . '/' . $method, $params);
@@ -207,7 +211,7 @@ class TmdbService {
 
 				curl_setopt($connextionHandler, CURLOPT_URL, $url);
 				curl_setopt($connextionHandler, CURLOPT_HTTPHEADER, $headers);
-				curl_setopt($connextionHandler, CURLOPT_HEADER, false);
+				curl_setopt($connextionHandler, CURLOPT_HEADER, FALSE);
 				curl_setopt($connextionHandler, CURLOPT_RETURNTRANSFER, true);
 
 				$data = curl_exec($connextionHandler);
@@ -286,12 +290,16 @@ class TmdbService {
 			'language'      => $this->settings['language'],
 		);
 
-		$result = \TYPO3\Flow\Utility\Arrays::arrayMergeRecursiveOverrule($defaults, $params, FALSE, TRUE);
+		$result = Arrays::arrayMergeRecursiveOverrule($defaults, $params, FALSE, TRUE);
 		$result = $this->removeEmptyElementsRecursively($result);
 
 		return $result;
 	}
 
+	/**
+	 * @param array $array
+	 * @return array
+	 */
 	protected function removeEmptyElementsRecursively(array $array) {
 		$result = $array;
 		foreach ($result as $key => $value) {
@@ -308,5 +316,3 @@ class TmdbService {
 	}
 
 }
-
-?>

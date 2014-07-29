@@ -37,6 +37,9 @@ class DateViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper {
 	 * @return string
 	 */
 	public function render($date, $format = 'd.m.Y') {
+		if ($date instanceof \DateTime) {
+			return $date->format($format);
+		}
 		$dateObject = new \DateTime();
 		$dateObject->createFromFormat('Y-m-d', $date);
 		return $dateObject->format($format);
