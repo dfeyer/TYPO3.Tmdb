@@ -122,8 +122,8 @@ class TmdbService {
 		$response = $this->sendRequest('search/' . $type, $params);
 		if (!$response->hasError()) {
 
+			$results    = array();
 			if (count($response->getData()->results) <= $limit) {
-				$results    = array();
 				foreach ($response->getData()->results as $asset) {
 					if ($expand) {
 						$info = $this->getAssetInformations($type, $asset->id);
