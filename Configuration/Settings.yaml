@@ -12,8 +12,8 @@ TYPO3:
       version: 3
     include_adult: TRUE
     language: 'fr'
-    paged: FALSE
-    debug: FALSE
+    paged: false
+    debug: false
     asset:
       Movie:
         class: 'TYPO3\Tmdb\Asset\Movie'

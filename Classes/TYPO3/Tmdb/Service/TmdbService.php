@@ -16,6 +16,7 @@ use TYPO3\Flow\Cache\Frontend\StringFrontend;
 use TYPO3\Flow\Object\ObjectManagerInterface;
 use TYPO3\Flow\Utility\Arrays;
 use TYPO3\Tmdb\Exception\ResponseException;
+use TYPO3\Tmdb\Response;
 
 /**
  * @Flow\Scope("singleton")
@@ -175,11 +176,11 @@ class TmdbService {
 	 * @param string $method
 	 * @param array $params
 	 * @param array $data
-	 * @return \TYPO3\Tmdb\Response
+	 * @return Response
 	 */
 	protected function sendRequest($method, $params = array(), $data = array()) {
 
-		$response = new \TYPO3\Tmdb\Response();
+		$response = new Response();
 
 		$params = $this->paramsMerge($params);
 
@@ -224,27 +225,8 @@ class TmdbService {
 
 			curl_close($connextionHandler);
 
-			if (empty($response->getData()->status_code) && $response->getData() !== NULL) {
-				$data = $response->getData();
-				// Todo add parameter to set max limit
-				if (!$this->settings['paged'] && isset($data->total_pages) && $data->page < 2) {
-					$pagedResponse = $this->sendRequest($method, $params + array('page' => $data->page + 1));
-
-					if (!$pagedResponse->hasError()) {
-						$this->response = array();
-						$this->error = $response->getError();
-					} else {
-						$data->page        = 1;
-						$data->results     = array_merge($data->results, $pagedResponse->getData()->results);
-						$data->total_pages = 1;
-					}
-				}
-			} else {
-				if ($response->getData() === NULL) {
-					$response->registerError(1350512167, 'Empty response');
-				} else {
-					$response->registerError($response->getData()->status_code, $response->getData()->status_message);
-				}
+			if ($response->getData() === NULL) {
+				$response->registerError(1350512167, 'Empty response');
 			}
 		}
 
