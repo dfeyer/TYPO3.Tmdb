@@ -10,6 +10,7 @@ namespace TYPO3\Tmdb\ViewHelpers;
  *                                                                        *
  * The TYPO3 project - inspiring people to share!                         *
  *                                                                        */
+use TYPO3\Tmdb\Asset\Movie;
 
 
 /**
@@ -32,11 +33,14 @@ class AlternativeTitlesViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractV
 	}
 
 	/**
-	 * @param \TYPO3\Tmdb\Asset\Movie $movie
+	 * @param Movie $movie
 	 * @param string $country
 	 * @return string
 	 */
-	public function render(\TYPO3\Tmdb\Asset\Movie $movie, $country = null) {
+	public function render(Movie $movie = NULL, $country = NULL) {
+		if ($movie === NULL) {
+			return NULL;
+		}
 		$titles = $movie->getAlternativeTitles($country);
 		$output = array();
 		foreach ($titles as $title) {
@@ -45,7 +49,7 @@ class AlternativeTitlesViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractV
 
 		$output = implode(', ', $output);
 		if (trim($output) === '') {
-			$output = '-';
+			$output = NULL;
 		}
 
 		return $output;
