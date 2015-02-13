@@ -12,46 +12,56 @@ namespace TYPO3\Tmdb\ViewHelpers;
  *                                                                        */
 
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Fluid\Core\Rendering\RenderingContextInterface;
+use TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper;
+use TYPO3\Fluid\Core\ViewHelper\Facets\CompilableInterface;
+use TYPO3\Tmdb\Asset\Movie;
+use TYPO3\Tmdb\Service\TmdbService;
 
 /**
  * Display Backdrop Thumbnail
  *
  * @api
  */
-class ImageViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper implements \TYPO3\Fluid\Core\ViewHelper\Facets\CompilableInterface {
+class ImageViewHelper extends AbstractViewHelper implements CompilableInterface {
 
 	/**
 	 * @Flow\Inject
-	 * @var \TYPO3\Tmdb\Service\TmdbService
+	 * @var TmdbService
 	 */
 	protected $tmdbService;
 
 	/**
-	 * @param \TYPO3\Tmdb\Asset\Movie $movie
+	 * @param Movie $movie
 	 * @param string $type
 	 * @return string Rendered URI
 	 * @api
 	 */
-	public function render(\TYPO3\Tmdb\Asset\Movie $movie, $type) {
+	public function render(Movie $movie, $type) {
 		return self::renderStatic($this->arguments, $this->buildRenderChildrenClosure(), $this->renderingContext);
 	}
 
 	/**
 	 * @param array $arguments
 	 * @param \Closure $renderChildrenClosure
-	 * @param \TYPO3\Fluid\Core\Rendering\RenderingContextInterface $renderingContext
+	 * @param RenderingContextInterface $renderingContext
 	 * @return string
-	 * @throws \TYPO3\Fluid\Core\ViewHelper\Exception
 	 */
-	static public function renderStatic(array $arguments, \Closure $renderChildrenClosure, \TYPO3\Fluid\Core\Rendering\RenderingContextInterface $renderingContext) {
+	static public function renderStatic(array $arguments, \Closure $renderChildrenClosure, RenderingContextInterface $renderingContext) {
 		$templateVariableContainer = $renderingContext->getTemplateVariableContainer();
 		$output = '';
 		switch ($arguments['type']) {
 			case 'posters':
-				$images = $arguments['movie']->getPosters('w185', 'fr');
+				$images = array(
+					'small' => $arguments['movie']->getPosters('w185', 'fr'),
+					'original' => $arguments['movie']->getPosters('original', 'fr')
+				);
 				break;
 			case 'backdrops':
-				$images = $arguments['movie']->getBackdrops('w300');
+				$images = array(
+					'small' => $arguments['movie']->getBackdrops('w185'),
+					'original' => $arguments['movie']->getBackdrops('original')
+				);
 				break;
 			default:
 				throw new \InvalidArgumentException(
@@ -59,15 +69,13 @@ class ImageViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractViewHelper im
 					1350563812
 				);
 		}
-		foreach ($images as $image) {
-			$src = $image->file_path;
-			$templateVariableContainer->add('src', $src);
+		foreach (array_keys($images['small']) as $key) {
+			$templateVariableContainer->add('small', $images['small'][$key]->file_path);
+			$templateVariableContainer->add('original', $images['original'][$key]->file_path);
 			$output .= $renderChildrenClosure();
-			$templateVariableContainer->remove('src');
+			$templateVariableContainer->remove('small');
+			$templateVariableContainer->remove('original');
 		}
 		return $output;
 	}
 }
-
-
-?>
