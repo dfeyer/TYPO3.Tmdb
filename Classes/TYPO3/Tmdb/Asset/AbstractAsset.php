@@ -61,7 +61,7 @@ abstract class AbstractAsset {
 	}
 
 	/**
-	 * Get an image base method
+	 * Get an image Tmdb URI
 	 *
 	 * @param string $type backdrop, poster, profile, logo, ...
 	 * @param bool|string $size integer or preset name
@@ -70,24 +70,20 @@ abstract class AbstractAsset {
 	 * @return string
 	 */
 	public function getImageUrl($type, $size = FALSE, $random = FALSE, $language = NULL) {
-		$image    = NULL;
-		$typeset  = $type . 's';
-		$path_key = $type . '_path';
+		$image = NULL;
+		$typeSet = $type . 's';
+		$pathKey = $type . 'Path';
 
 		if ($random === TRUE) {
 			$images = $this->getImages($language, false);
 			if (count($images) > 1) {
-				$index             = rand(0, count($images->{$typeset}) - 1);
-				$this->data[$path_key] = $images->data[$typeset][$index]->file_path;
+				$index = rand(0, count($images->{$typeSet}) - 1);
+				$this->data[$pathKey] = $images->data[$typeSet][$index]->file_path;
 			}
 		}
 
-		if (isset($this->{$path_key})) {
-			if ($size) {
-				$image = $this->tmdbService->getImageUrl($type, $size, $this->data[$path_key]);
-			} else {
-				$image = $this->{$path_key};
-			}
+		if (isset($this->{$pathKey})) {
+			$image = $this->tmdbService->getImageUrl($type, $size, $this->{$pathKey});
 		}
 
 		return $image;
