@@ -148,7 +148,7 @@ class Movie extends AbstractAsset {
 	 */
 	public function getAlternativeTitles($country = ''){
 		$alternativeTitles = $this->tmdbService->getAssetInformations(self::type, $this->id, 'alternative_titles', array('country'=>$country));
-		$this->alternativeTitles = $alternativeTitles->titles;
+		$this->alternativeTitles = $alternativeTitles ? $alternativeTitles->titles : null;
 
 		return $this->alternativeTitles;
 	}
