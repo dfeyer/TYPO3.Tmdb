@@ -41,8 +41,8 @@ class AlternativeTitlesViewHelper extends \TYPO3\Fluid\Core\ViewHelper\AbstractV
 		if ($movie === NULL) {
 			return NULL;
 		}
-		$titles = $movie->getAlternativeTitles($country);
-		$output = array();
+		$titles = $movie->getAlternativeTitles($country) ?: [];
+		$output = [];
 		foreach ($titles as $title) {
 			$output[] = $title->title;
 		}
